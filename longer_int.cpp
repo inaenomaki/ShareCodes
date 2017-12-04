@@ -24,16 +24,12 @@ longer_int::longer_int(const std::string& num) {
 }
 
 longer_int::longer_int(const longer_int& num) {
-	this->set_num(num.get_num_cpy());
+	this->set_num(num.str());
 }
 
 //アクセサ
 
-const std::string& longer_int::get_num_cpy() const {
-	return num_str;
-}
-
-std::string& longer_int::get_num_ref() {
+const std::string& longer_int::str() const {
 	return num_str;
 }
 
@@ -44,11 +40,38 @@ void longer_int::set_num(std::string num) {
 	adjust_str(num_str);
 }
 
+//左から数えてn番目の桁の値を返す
+int longer_int::digit_from_left(int n) {
+	//文字数と同じかそれより小さい値を指定
+	assert(num_str.size() >= n);
+
+	//char->intの変換
+	/*
+	return char_val-'0';とすることも考えたが
+	どこまで通用するかもわかっていないので
+	今回は不採用
+	*/
+
+	std::string tmp(1, num_str[n-1]);
+	return std::stoi(tmp);
+}
+
+//右から数えてn番目の桁の値を返す
+int longer_int::digit_from_right(int n) {
+	//右からn番目は左から(要素数-n+1)番目
+	return digit_from_left(num_str.size()-n+1);
+}
+
+
 //"longer_int" and "int"
 
 longer_int::operator int() const {
 	assert(num_str != "");//空文字列は変換できないので代入するか初期化する
-	return std::stoi(get_num_cpy());
+
+	//intの最大値以下
+	assert(num_str == std::to_string(INT_MAX) || less_str(num_str, std::to_string(INT_MAX)));
+
+	return std::stoi(this->str());
 }
 
 //"longer_int"
@@ -59,22 +82,22 @@ longer_int longer_int::operator+() const {
 
 longer_int longer_int::operator-() const {
 	//負の値だったら
-	if (this->get_num_cpy()[0] == '-') {
+	if (this->str()[0] == '-') {
 		//一文字目を削除したもの(=正の値)を返す
-		longer_int reverse_val(get_num_cpy());
-		reverse_val.get_num_ref().erase(reverse_val.get_num_ref().begin());
+		longer_int reverse_val(this->str());
+		reverse_val.num_str.erase(reverse_val.num_str.begin());
 		return reverse_val;
 	}
 	//正の値だったら
 	else {
-		return longer_int("-" + this->get_num_cpy());
+		return longer_int("-" + this->str());
 	}
 }
 
 //前置インクリメント
 longer_int longer_int::operator++() {
 	//数値をインクリメント
-	set_num(std::to_string(std::stoi(this->get_num_cpy()) + 1));
+	set_num(std::to_string(std::stoi(this->str()) + 1));
 	return *this;
 }
 
@@ -95,7 +118,7 @@ longer_int longer_int::operator++(int) {
 //前置デクリメント
 longer_int longer_int::operator--() {
 	//数値をデクリメント
-	set_num(std::to_string(std::stoi(this->get_num_cpy()) - 1));
+	set_num(std::to_string(std::stoi(this->str()) - 1));
 	return *this;
 }
 
@@ -115,7 +138,7 @@ longer_int longer_int::operator--(int) {
 //"longer_int" and "longer_int"
 
 longer_int& longer_int::operator=(const longer_int& obj) {
-	set_num(obj.get_num_cpy());
+	set_num(obj.str());
 	return *this;
 }
 
@@ -214,13 +237,13 @@ longer_int& longer_int::operator %=(const std::string& num) {
 
 const longer_int operator +(const longer_int& a, const longer_int& b) {
 	//加算したstringを返す
-	return longer_int(add_str(a.get_num_cpy(), b.get_num_cpy()));
+	return longer_int(add_str(a.str(), b.str()));
 }
 
 
 const longer_int operator -(const longer_int& a, const longer_int& b) {
 	//加算したstringを返す
-	return longer_int(sub_str(a.get_num_cpy(), b.get_num_cpy()));
+	return longer_int(sub_str(a.str(), b.str()));
 }
 const longer_int operator *(const longer_int& a, const longer_int& b) {
 	longer_int answer = 0;
@@ -263,7 +286,7 @@ const longer_int operator %(const longer_int& a, const longer_int& b) {
 }
 
 const bool operator ==(const longer_int& a, const longer_int& b) {
-	return a.get_num_cpy() == b.get_num_cpy();
+	return a.str() == b.str();
 }
 
 const bool operator !=(const longer_int& a, const longer_int& b) {
@@ -271,7 +294,7 @@ const bool operator !=(const longer_int& a, const longer_int& b) {
 }
 
 const bool operator >(const longer_int& a, const longer_int& b) {
-	return greater_str(a.get_num_cpy(), b.get_num_cpy());
+	return greater_str(a.str(), b.str());
 }
 
 const bool operator >=(const longer_int& a, const longer_int& b) {
@@ -279,7 +302,7 @@ const bool operator >=(const longer_int& a, const longer_int& b) {
 }
 
 const bool operator <(const longer_int& a, const longer_int& b) {
-	return less_str(a.get_num_cpy(), b.get_num_cpy());
+	return less_str(a.str(), b.str());
 }
 
 const bool operator <=(const longer_int& a, const longer_int& b) {
@@ -291,12 +314,12 @@ const bool operator <=(const longer_int& a, const longer_int& b) {
 
 const longer_int operator +(const longer_int& a, const int& b) {
 	//加算したstringを返す
-	return longer_int(add_str(a.get_num_cpy(), std::to_string(b)));
+	return longer_int(add_str(a.str(), std::to_string(b)));
 }
 
 const longer_int operator -(const longer_int& a, const int& b) {
 	//加算したstringを返す
-	return longer_int(sub_str(a.get_num_cpy(), std::to_string(b)));
+	return longer_int(sub_str(a.str(), std::to_string(b)));
 }
 
 const longer_int operator *(const longer_int& a, const int& b) {
@@ -333,7 +356,7 @@ const longer_int operator %(const longer_int& a, const int& b) {
 }
 
 const bool operator ==(const longer_int& a, const int& b) {
-	return a.get_num_cpy() == std::to_string(b);
+	return a.str() == std::to_string(b);
 }
 
 const bool operator !=(const longer_int& a, const int& b) {
@@ -341,7 +364,7 @@ const bool operator !=(const longer_int& a, const int& b) {
 }
 
 const bool operator >(const longer_int& a, const int& b) {
-	return greater_str(a.get_num_cpy(), std::to_string(b));
+	return greater_str(a.str(), std::to_string(b));
 }
 
 const bool operator >=(const longer_int& a, const int& b) {
@@ -349,7 +372,7 @@ const bool operator >=(const longer_int& a, const int& b) {
 }
 
 const bool operator <(const longer_int& a, const int& b) {
-	return less_str(a.get_num_cpy(), std::to_string(b));
+	return less_str(a.str(), std::to_string(b));
 }
 
 const bool operator <=(const longer_int& a, const int& b) {
@@ -410,12 +433,12 @@ const bool operator <=(const int& a, const longer_int& b) {
 
 const longer_int operator +(const longer_int& a, const std::string& b) {
 	//加算したstringを返す
-	return longer_int(add_str(a.get_num_cpy(), b));
+	return longer_int(add_str(a.str(), b));
 }
 
 const longer_int operator -(const longer_int& a, const std::string& b) {
 	//加算したstringを返す
-	return longer_int(sub_str(a.get_num_cpy(), b));
+	return longer_int(sub_str(a.str(), b));
 }
 
 const longer_int operator *(const longer_int& a, const std::string& b) {
@@ -432,7 +455,7 @@ const longer_int operator /(const longer_int& a, const std::string& b) {
 	longer_int subtract_num = 0;//減算した回数
 
 	//aからbが引けなくなるまで引いていく
-	for (; greater_str(divided.get_num_cpy(), b); subtract_num++) {
+	for (; greater_str(divided.str(), b); subtract_num++) {
 		divided -= b;
 	}
 
@@ -444,7 +467,7 @@ const longer_int operator %(const longer_int& a, const std::string& b) {
 	longer_int subtract_num = 0;//減算した回数
 
 								//aからbが引けなくなるまで引いていく
-	for (; greater_str(divided.get_num_cpy(), b); subtract_num++) {
+	for (; greater_str(divided.str(), b); subtract_num++) {
 		divided -= b;
 	}
 	//余った部分を返す
@@ -452,7 +475,7 @@ const longer_int operator %(const longer_int& a, const std::string& b) {
 }
 
 const bool operator ==(const longer_int& a, const std::string& b) {
-	return a.get_num_cpy() == b;
+	return a.str() == b;
 }
 
 const bool operator !=(const longer_int& a, const std::string& b) {
@@ -460,7 +483,7 @@ const bool operator !=(const longer_int& a, const std::string& b) {
 }
 
 const bool operator >(const longer_int& a, const std::string& b) {
-	return greater_str(a.get_num_cpy(), b);
+	return greater_str(a.str(), b);
 }
 
 const bool operator >=(const longer_int& a, const std::string& b) {
@@ -468,7 +491,7 @@ const bool operator >=(const longer_int& a, const std::string& b) {
 }
 
 const bool operator <(const longer_int& a, const std::string& b) {
-	return less_str(a.get_num_cpy(), b);
+	return less_str(a.str(), b);
 }
 
 const bool operator <=(const longer_int& a, const std::string& b) {

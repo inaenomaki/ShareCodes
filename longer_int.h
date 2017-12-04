@@ -19,11 +19,14 @@ public:
 	longer_int(const longer_int& num);
 
 	//コピーを返す(実際にはconst参照)
-	const std::string& get_num_cpy() const;
-	//参照を返す
-	std::string& get_num_ref();
+	const std::string& str() const;
 
 	void set_num(std::string num);
+
+	//左から数えてn番目の桁の値を返す
+	int digit_from_left(int n);
+	//右から数えてn番目の桁の値を返す
+	int digit_from_right(int n);
 
 	//演算子オーバーロード
 	//
