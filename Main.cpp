@@ -2,25 +2,20 @@
 #include<iostream>
 
 int main(void) {
-	const int ary_num = 5;
+	const int ary_num = 7;
 	longer_int hoge[ary_num];
 
-	hoge[0] = "10";
+	hoge[0] = 1;//int‚Ì‘ã“ü
 
-	hoge[1] = "2.5f";
+	hoge[1] = "2";//std::string‚Ì‘ã“ü
 
-	hoge[2] = 5.9;
+	hoge[2] = hoge[0] + hoge[1];//longer_int + longer_int
 
-	int huga = 4;
+	hoge[3] = hoge[0] + 3;//longer_int + int
 
-	hoge[3] = "2951";
-
-	hoge[4] = hoge[2];
-
+	hoge[4] = 3 + hoge[0];//int + longer_int
 
 	for (int i = 0; i < ary_num; i++) {
 		std::cout << hoge[i].str() << std::endl;
 	}
-	int foo = hoge[3].digit_from_right(4);
-	std::cout << foo << std::endl;
 }

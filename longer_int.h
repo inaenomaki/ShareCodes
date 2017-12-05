@@ -18,7 +18,7 @@ public:
 	longer_int(const std::string& num);
 	longer_int(const longer_int& num);
 
-	//コピーを返す(実際にはconst参照)
+	//数字の実体
 	const std::string& str() const;
 
 	void set_num(std::string num);

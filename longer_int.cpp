@@ -27,8 +27,6 @@ longer_int::longer_int(const longer_int& num) {
 	this->set_num(num.str());
 }
 
-//アクセサ
-
 const std::string& longer_int::str() const {
 	return num_str;
 }
@@ -52,24 +50,25 @@ int longer_int::digit_from_left(int n) {
 	今回は不採用
 	*/
 
-	std::string tmp(1, num_str[n-1]);
+	std::string tmp(1, num_str[n - 1]);
 	return std::stoi(tmp);
 }
 
 //右から数えてn番目の桁の値を返す
 int longer_int::digit_from_right(int n) {
 	//右からn番目は左から(要素数-n+1)番目
-	return digit_from_left(num_str.size()-n+1);
+	return digit_from_left(num_str.size() - n + 1);
 }
 
 
 //"longer_int" and "int"
 
 longer_int::operator int() const {
-	assert(num_str != "");//空文字列は変換できないので代入するか初期化する
+	//空文字列は変換できないので代入するか初期化する
+	assert(num_str != "");
 
-	//intの最大値以下
-	assert(num_str == std::to_string(INT_MAX) || less_str(num_str, std::to_string(INT_MAX)));
+	//intの最大値未満
+	assert(less_str(num_str, std::to_string(INT_MAX)));
 
 	return std::stoi(this->str());
 }
@@ -97,15 +96,14 @@ longer_int longer_int::operator-() const {
 //前置インクリメント
 longer_int longer_int::operator++() {
 	//数値をインクリメント
-	set_num(std::to_string(std::stoi(this->str()) + 1));
+	*this += 1;
 	return *this;
 }
 
 //後置インクリメント
 longer_int longer_int::operator++(int) {
-
 	//もとの値をとっておく
-	longer_int old(*this);
+	longer_int old = *this;
 
 	//加算する
 	++(*this);
@@ -118,13 +116,12 @@ longer_int longer_int::operator++(int) {
 //前置デクリメント
 longer_int longer_int::operator--() {
 	//数値をデクリメント
-	set_num(std::to_string(std::stoi(this->str()) - 1));
+	*this -= 1;
 	return *this;
 }
 
 //後置デクリメント
 longer_int longer_int::operator--(int) {
-
 	//もとの値をとっておく
 	longer_int old(*this);
 
@@ -175,8 +172,8 @@ longer_int& longer_int::operator %= (const longer_int& obj) {
 
 	return  (*this);
 }
-//"longer_int" and "int"
 
+//"longer_int" and "int"
 
 longer_int& longer_int::operator =(const int& num) {
 	set_num(std::to_string(num));
@@ -184,23 +181,23 @@ longer_int& longer_int::operator =(const int& num) {
 }
 
 longer_int& longer_int::operator +=(const int& num) {
-	return *this += std::to_string(num);
+	return *this += longer_int(num);
 }
 
 longer_int& longer_int::operator -=(const int& num) {
-	return *this -= std::to_string(num);
+	return *this -= longer_int(num);
 }
 
 longer_int& longer_int::operator *=(const int& num) {
-	return *this *= std::to_string(num);
+	return *this *= longer_int(num);
 }
 
 longer_int& longer_int::operator /=(const int& num) {
-	return *this /= std::to_string(num);
+	return *this /= longer_int(num);
 }
 
 longer_int& longer_int::operator %=(const int& num) {
-	return *this %= std::to_string(num);
+	return *this %= longer_int(num);
 }
 
 //"longer_int" and "std::string"
@@ -240,11 +237,11 @@ const longer_int operator +(const longer_int& a, const longer_int& b) {
 	return longer_int(add_str(a.str(), b.str()));
 }
 
-
 const longer_int operator -(const longer_int& a, const longer_int& b) {
 	//加算したstringを返す
 	return longer_int(sub_str(a.str(), b.str()));
 }
+
 const longer_int operator *(const longer_int& a, const longer_int& b) {
 	longer_int answer = 0;
 	//b回0にaを足す
@@ -272,9 +269,8 @@ const longer_int operator %(const longer_int& a, const longer_int& b) {
 	longer_int divided = a;//割られるために使われる。aはconst参照なので
 	longer_int subtract_num = 0;//減算した回数
 
-								 //割る方は0ではいけない
+	//割る方は0ではいけない
 	assert(b != 0);
-
 
 	//aからbが引けなくなるまで引いていく
 	for (; divided > b; subtract_num++) {
@@ -323,36 +319,15 @@ const longer_int operator -(const longer_int& a, const int& b) {
 }
 
 const longer_int operator *(const longer_int& a, const int& b) {
-	longer_int answer = 0;
-	//b回0にaを足す
-	for (longer_int i = 0; i < b; i++) {
-		answer += a;
-	}
-	return answer;
+	return a*longer_int(b);
 }
 
 const longer_int operator /(const longer_int& a, const int& b) {
-	longer_int divided = a;//割られるために使われる。aはconst参照なので
-	longer_int subtract_num = 0;//減算した回数
-
-								 //aからbが引けなくなるまで引いていく
-	for (; divided > b; subtract_num++) {
-		divided -= b;
-	}
-
-	return subtract_num;
+	return a/longer_int(b);
 }
 
 const longer_int operator %(const longer_int& a, const int& b) {
-	longer_int divided = a;//割られるために使われる。aはconst参照なので
-	longer_int subtract_num = 0;//減算した回数
-
-								 //aからbが引けなくなるまで引いていく
-	for (; divided > b; subtract_num++) {
-		divided -= b;
-	}
-	//余った部分を返す
-	return divided;
+	return a%longer_int(b);
 }
 
 const bool operator ==(const longer_int& a, const int& b) {
@@ -381,7 +356,6 @@ const bool operator <=(const longer_int& a, const int& b) {
 
 
 //"int" and "longer_int" 
-
 
 const longer_int operator +(const int& a, const longer_int& b) {
 	return b + a;
@@ -432,7 +406,6 @@ const bool operator <=(const int& a, const longer_int& b) {
 //"longer_int" and "std::string"
 
 const longer_int operator +(const longer_int& a, const std::string& b) {
-	//加算したstringを返す
 	return longer_int(add_str(a.str(), b));
 }
 
@@ -442,36 +415,15 @@ const longer_int operator -(const longer_int& a, const std::string& b) {
 }
 
 const longer_int operator *(const longer_int& a, const std::string& b) {
-	longer_int answer = 0;
-	//b回0にaを足す
-	for (longer_int i = 0; less_str(std::to_string(i), b); i++) {
-		answer += a;
-	}
-	return answer;
+	return a*longer_int(b);
 }
 
 const longer_int operator /(const longer_int& a, const std::string& b) {
-	longer_int divided = a;//割られるために使われる。aはconst参照なので
-	longer_int subtract_num = 0;//減算した回数
-
-	//aからbが引けなくなるまで引いていく
-	for (; greater_str(divided.str(), b); subtract_num++) {
-		divided -= b;
-	}
-
-	return subtract_num;
+	return a/longer_int(b);
 }
 
 const longer_int operator %(const longer_int& a, const std::string& b) {
-	longer_int divided = a;//割られるために使われる。aはconst参照なので
-	longer_int subtract_num = 0;//減算した回数
-
-								//aからbが引けなくなるまで引いていく
-	for (; greater_str(divided.str(), b); subtract_num++) {
-		divided -= b;
-	}
-	//余った部分を返す
-	return divided;
+	return a%longer_int(b);
 }
 
 const bool operator ==(const longer_int& a, const std::string& b) {
