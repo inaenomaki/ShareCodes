@@ -1,3 +1,4 @@
+#include <algorithm>
 #include"myFunc.h"
 
 //指定したサイズの文字列のうち、右から指定したorder番目の
@@ -16,17 +17,9 @@ void adjust_str(std::string& num) {
 		return;
 	}
 
-	//頭に1つでも0があったら
-	for (auto iter = num.begin(); (*iter) == '0'; ) {
-
-		//削除したら空文字列になってしまう場合は消さない
-		if (num.size() <= 1) {
-			return;
-		}
-
-		//削除して前へ進める
-		iter = num.erase(iter);
-	}
+	size_t pos = num.find_first_not_of('0');
+	if (pos == std::string::npos) pos = num.length() - 1;
+	num.erase(num.begin(), num.begin() + pos);
 }
 
 std::string add_str(std::string a_num, std::string b_num) {
