@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include<iostream>
 
 //
 //文字列系
@@ -24,3 +25,12 @@ bool greater_str(std::string a_num, std::string b_num);
 
 //2つの文字列を数字として比較し a_num < b_num となっていたらtrueを返し、なっていなければfalseを返す
 bool less_str(std::string a_num, std::string b_num);
+
+//変数簡易表示マクロ。変数を渡すと変数名とその値を標準出力に出力してくれる。
+#define cout_instant(var)CoutInst(#var,var)
+
+//これは直接は使わない。cout_instantマクロを使う事でこいつが呼ばれる。
+template<class T>
+void CoutInst(std::string name,T var) {
+	std::cout << name << " : " << var << std::endl;
+}
